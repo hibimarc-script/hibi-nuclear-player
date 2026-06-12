@@ -1,9 +1,10 @@
 import { createRootRoute } from '@tanstack/react-router';
 import {
+  BarChart2Icon,
   CableIcon,
   DiscIcon,
-  GaugeIcon,
   ListMusicIcon,
+  MicVocalIcon,
   MusicIcon,
   SettingsIcon,
   UserIcon,
@@ -68,9 +69,9 @@ const RootComponent = () => {
             <SidebarNavigation isCompact={leftSidebar.isCollapsed}>
               <div className="flex flex-1 flex-col gap-2 overflow-y-auto">
                 <SidebarNavigationItem
-                  to="/dashboard"
-                  icon={<GaugeIcon />}
-                  label={t('dashboard')}
+                  to="/top-artists"
+                  icon={<BarChart2Icon />}
+                  label="Hibi Dashboard"
                 />
                 <SidebarNavigationItem
                   to="/favorites/albums"
@@ -96,6 +97,11 @@ const RootComponent = () => {
                   to="/sources"
                   icon={<CableIcon />}
                   label={t('sources')}
+                />
+                <SidebarNavigationItem
+                  to="/lyrics"
+                  icon={<MicVocalIcon />}
+                  label="Lyrics"
                 />
               </div>
               <SidebarNavigationItem
