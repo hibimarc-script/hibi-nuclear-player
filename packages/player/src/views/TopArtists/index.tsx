@@ -5,7 +5,6 @@ import { useQueueStore } from '../../stores/queueStore';
 import { useSoundStore } from '../../stores/soundStore';
 
 const API_KEY = '4cfb44440a5c765c3c688835d95ac6fa';
-const USERNAME = 'Hibimarc';
 const LASTFM_PLACEHOLDER = '2a96cbd8b46e442fc41c2b86b821562f';
 
 const isValidImage = (url?: string): boolean =>
@@ -28,6 +27,10 @@ export const TopArtistsView: FC = () => {
   const navigate = useNavigate();
   const { addToQueue, goToId } = useQueueStore();
   const { play } = useSoundStore();
+  const [username, setUsername] = useState(
+    () => localStorage.getItem('hibi-lastfm-user') ?? '',
+  );
+  const [usernameInput, setUsernameInput] = useState('');
   const [artists, setArtists] = useState<Artist[]>([]);
   const [recentTracks, setRecentTracks] = useState<RecentTrack[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,26 +42,32 @@ export const TopArtistsView: FC = () => {
   const [artistImages, setArtistImages] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    if (!username) {
+      return;
+    }
     setLoading(true);
     fetch(
-      `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${USERNAME}&api_key=${API_KEY}&period=${period}&limit=20&format=json`,
+      `https://ws.audioscrobbler.com/2.0/?method=user.gettopartists&user=${encodeURIComponent(username)}&api_key=${API_KEY}&period=${period}&limit=20&format=json`,
     )
       .then((res) => res.json())
       .then((data) => setArtists(data.topartists?.artist ?? []))
       .catch(() => setArtists([]))
       .finally(() => setLoading(false));
-  }, [period]);
+  }, [period, username]);
 
   useEffect(() => {
+    if (!username) {
+      return;
+    }
     setLoadingRecent(true);
     fetch(
-      `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${USERNAME}&api_key=${API_KEY}&limit=20&format=json`,
+      `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${encodeURIComponent(username)}&api_key=${API_KEY}&limit=20&format=json`,
     )
       .then((res) => res.json())
       .then((data) => setRecentTracks(data.recenttracks?.track ?? []))
       .catch(() => setRecentTracks([]))
       .finally(() => setLoadingRecent(false));
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     if (recentTracks.length === 0) {
@@ -115,6 +124,23 @@ export const TopArtistsView: FC = () => {
     });
   }, [artists]);
 
+  const handleSaveUsername = () => {
+    const clean = usernameInput.trim();
+    if (!clean) {
+      return;
+    }
+    localStorage.setItem('hibi-lastfm-user', clean);
+    setUsername(clean);
+  };
+
+  const handleChangeUser = () => {
+    localStorage.removeItem('hibi-lastfm-user');
+    setUsername('');
+    setUsernameInput('');
+    setArtists([]);
+    setRecentTracks([]);
+  };
+
   const handleTrackClick = (
     trackName: string,
     artistName: string,
@@ -152,6 +178,62 @@ export const TopArtistsView: FC = () => {
     { value: 'overall', label: 'All time' },
   ];
 
+  // Pantalla de configuración si no hay username
+  if (!username) {
+    return (
+      <div
+        style={{
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+        }}
+      >
+        <div style={{ maxWidth: '400px', textAlign: 'center' }}>
+          <h2 style={{ marginBottom: '0.5rem' }}>Hibi Dashboard 🎵</h2>
+          <p
+            style={{ opacity: 0.6, marginBottom: '1.5rem', fontSize: '0.9rem' }}
+          >
+            Enter your Last.fm username to see your music stats
+          </p>
+          <input
+            value={usernameInput}
+            onChange={(e) => setUsernameInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSaveUsername()}
+            placeholder="Your Last.fm username"
+            style={{
+              width: '100%',
+              padding: '0.6rem 1rem',
+              borderRadius: 8,
+              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.05)',
+              color: 'inherit',
+              fontSize: '0.9rem',
+              marginBottom: '1rem',
+              boxSizing: 'border-box',
+            }}
+          />
+          <button
+            onClick={handleSaveUsername}
+            style={{
+              padding: '0.6rem 2rem',
+              borderRadius: 8,
+              border: 'none',
+              background: 'rgba(255,255,255,0.15)',
+              color: 'inherit',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: 600,
+            }}
+          >
+            Connect
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -162,7 +244,31 @@ export const TopArtistsView: FC = () => {
       }}
     >
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ marginBottom: '0.25rem' }}>Hibi Dashboard 🎵</h2>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '0.25rem',
+          }}
+        >
+          <h2 style={{ margin: 0 }}>Hibi Dashboard 🎵</h2>
+          <button
+            onClick={handleChangeUser}
+            style={{
+              padding: '0.3rem 0.8rem',
+              borderRadius: '999px',
+              border: '1px solid rgba(255,255,255,0.2)',
+              background: 'transparent',
+              color: 'inherit',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              opacity: 0.6,
+            }}
+          >
+            {username} · change
+          </button>
+        </div>
         <p
           style={{ opacity: 0.5, marginBottom: '1.5rem', fontSize: '0.85rem' }}
         >
