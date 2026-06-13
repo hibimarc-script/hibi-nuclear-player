@@ -28,12 +28,32 @@ pnpm --filter @nuclearplayer/player build
 
 The installer will be generated in `packages/player/src-tauri/target/release/bundle/nsis/`.
 
+## 🔌 Plugins (important!)
+
+Some features rely on custom plugins that are **not bundled inside the installer** — they live in a separate folder per user and must be added manually inside Nuclear.
+
+To install them:
+
+1. Create a folder on your local disk for the plugins, for example: C:\nuclear-plugins\
+
+2. Copy the plugin folders from this repo (e.g. `hibi-youtube-playlists`) into that folder. Each plugin should keep its own subfolder with its `package.json` and `index.ts`.
+3. Open Nuclear and go to **Preferences → Plugins**.
+4. Click **Add Plugin** and select the plugin's folder (e.g. `C:\nuclear-plugins\hibi-youtube-playlists`).
+5. The plugin will be installed and enabled automatically.
+
+> **Note:** Nuclear copies the plugin into its own data folder when you add it. To update a plugin after changing its code, remove it in Nuclear and add it again.
+
+### Available plugins
+
+- **Hibi YouTube Playlists** — Import YouTube and YouTube Music playlists directly into your library without needing yt-dlp.
+
 ## 🛠️ Built with
 
 Nuclear is a pnpm monorepo managed with Turborepo. The main app is built with Tauri (Rust + React).
 
 ## 🙏 Credits
 
+Thanks a lot for creating this amazing player!
 - Original player: **[Nuclear by nukeop](https://github.com/nukeop/nuclear)**
 - This fork & custom features: **[hibimarc-script](https://github.com/hibimarc-script)**
 
