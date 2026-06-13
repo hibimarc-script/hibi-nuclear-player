@@ -1,7 +1,7 @@
 import type { FC, PropsWithChildren } from 'react';
 import { useCallback, useEffect } from 'react';
 
-import { Sound, Volume } from '@nuclearplayer/hifi';
+import { Analyzer, Sound, Volume } from '@nuclearplayer/hifi';
 
 import { useCoreSetting } from '../hooks/useCoreSetting';
 import { eventBus } from '../services/eventBus';
@@ -79,6 +79,7 @@ export const SoundProvider: FC<PropsWithChildren> = ({ children }) => {
           onError={handleError}
         >
           <Volume value={volumePercent} />
+          <Analyzer />
         </Sound>
       )}
       {children}

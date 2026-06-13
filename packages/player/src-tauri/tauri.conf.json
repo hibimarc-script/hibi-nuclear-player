@@ -35,9 +35,9 @@
     "createUpdaterArtifacts": false,
     "targets": ["nsis"],
     "icon": [
+      "icons/icon.ico",
       "icons/icon.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
+      "icons/icon.icns"
     ],
     "linux": {
       "deb": {

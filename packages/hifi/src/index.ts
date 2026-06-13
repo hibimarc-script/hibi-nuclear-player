@@ -2,6 +2,7 @@ export { Sound } from './Sound';
 export { CrossfadeSound } from './CrossfadeSound';
 export { pluginFactory } from './pluginFactory';
 export { Oscilloscope } from './Oscilloscope';
+export { Analyzer, analyzerStore } from './plugins/Analyzer';
 export { Volume } from './plugins/Volume';
 export { Stereo } from './plugins/Stereo';
 export { BiQuadFilter } from './plugins/BiQuadFilter';

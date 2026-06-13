@@ -1,20 +1,22 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
+import { analyzerStore } from '@nuclearplayer/hifi';
 import { pickArtwork } from '@nuclearplayer/model';
 
 import { useQueueStore } from '../../stores/queueStore';
 import { useSoundStore } from '../../stores/soundStore';
 
-type Mode = 'artwork' | 'waves' | 'particles';
+type Mode = 'artwork' | 'plasma' | 'aurora' | 'battery';
 
 export const VisualizerView: FC = () => {
   const currentItem = useQueueStore((s) => s.getCurrentItem());
   const status = useSoundStore((s) => s.status);
   const track = currentItem?.track;
   const isPlaying = status === 'playing';
-  const [mode, setMode] = useState<Mode>('artwork');
+  const [mode, setMode] = useState<Mode>('battery');
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
+  const feedbackRef = useRef<HTMLCanvasElement | null>(null);
 
   const artwork = pickArtwork(track?.artwork, 'cover', 600)?.url;
 
@@ -31,71 +33,201 @@ export const VisualizerView: FC = () => {
       return;
     }
 
+    if (!feedbackRef.current) {
+      feedbackRef.current = document.createElement('canvas');
+    }
+    const fb = feedbackRef.current;
+    const fbCtx = fb.getContext('2d');
+
     const resize = () => {
       canvas.width = canvas.clientWidth;
       canvas.height = canvas.clientHeight;
+      fb.width = canvas.width;
+      fb.height = canvas.height;
     };
     resize();
     window.addEventListener('resize', resize);
 
     let t = 0;
-    // Partículas para el modo particles
-    const particles = Array.from({ length: 60 }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      r: Math.random() * 3 + 1,
-      speed: Math.random() * 0.4 + 0.1,
-      hue: Math.random() * 360,
-    }));
+
+    let coreX = canvas.width / 2;
+    let coreY = canvas.height / 2;
+    let targetX = coreX;
+    let targetY = coreY;
+    let nextRetarget = 0;
+    let pauseUntil = 0;
+
+    const getBands = () => {
+      const analyser = analyzerStore.node;
+      let bass = 0,
+        mid = 0,
+        treble = 0,
+        overall = 0;
+      if (analyser) {
+        const bins = analyser.frequencyBinCount;
+        const data = new Uint8Array(bins);
+        analyser.getByteFrequencyData(data);
+        const third = Math.floor(bins / 3);
+        for (let i = 0; i < third; i++) {
+          bass += data[i];
+        }
+        for (let i = third; i < third * 2; i++) {
+          mid += data[i];
+        }
+        for (let i = third * 2; i < bins; i++) {
+          treble += data[i];
+        }
+        bass /= third * 255;
+        mid /= third * 255;
+        treble /= third * 255;
+        overall = (bass + mid + treble) / 3;
+      }
+      return { bass, mid, treble, overall };
+    };
 
     const draw = () => {
       const w = canvas.width;
       const h = canvas.height;
-      // Velocidad de animación: si está en pausa, casi quieto
-      const pace = isPlaying ? 1 : 0.15;
-      t += 0.02 * pace;
+      const cx = w / 2;
+      const cy = h / 2;
+      const { bass, mid, treble, overall } = getBands();
 
-      // Fondo con leve estela (efecto trail)
-      ctx.fillStyle = 'rgba(20, 12, 16, 0.18)';
-      ctx.fillRect(0, 0, w, h);
+      t += 0.01 + overall * 0.04;
 
-      if (mode === 'waves') {
-        const lines = 5;
-        for (let l = 0; l < lines; l++) {
+      if (mode === 'plasma') {
+        ctx.fillStyle = 'rgba(10, 6, 12, 0.25)';
+        ctx.fillRect(0, 0, w, h);
+        const maxR = Math.min(w, h) * 0.45;
+        const rings = 40;
+        for (let i = rings; i > 0; i--) {
+          const frac = i / rings;
+          const energy = i % 3 === 0 ? bass : i % 3 === 1 ? mid : treble;
+          const radius =
+            maxR * frac * (1 + energy * 0.6) +
+            Math.sin(t * 2 + i * 0.3) * 12 * (1 + overall * 3);
+          const hue = (t * 30 + i * 8 + bass * 120) % 360;
           ctx.beginPath();
-          const hue = (t * 40 + l * 60) % 360;
-          ctx.strokeStyle = `hsla(${hue}, 80%, 65%, 0.7)`;
-          ctx.lineWidth = 2.5;
-          for (let x = 0; x <= w; x += 6) {
-            const phase = x * 0.012 + t * 2 + l * 0.8;
-            const amp = (h / 6) * (1 + 0.4 * Math.sin(t + l));
-            const y = h / 2 + Math.sin(phase) * amp * Math.sin(x * 0.002 + t);
-            if (x === 0) {
-              ctx.moveTo(x, y);
-            } else {
-              ctx.lineTo(x, y);
-            }
-          }
+          ctx.arc(cx, cy, Math.max(1, radius), 0, Math.PI * 2);
+          ctx.strokeStyle = `hsla(${hue}, 90%, ${50 + energy * 30}%, ${0.15 + frac * 0.4})`;
+          ctx.lineWidth = 2 + energy * 6;
           ctx.stroke();
+        }
+        const coreR = maxR * 0.15 * (1 + bass * 1.5);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR);
+        grad.addColorStop(0, `hsla(${(t * 50) % 360}, 100%, 75%, 0.9)`);
+        grad.addColorStop(1, `hsla(${(t * 50 + 60) % 360}, 100%, 50%, 0)`);
+        ctx.beginPath();
+        ctx.arc(cx, cy, coreR, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
+      }
+
+      if (mode === 'aurora') {
+        ctx.fillStyle = 'rgba(8, 10, 14, 0.12)';
+        ctx.fillRect(0, 0, w, h);
+        const layers = 6;
+        for (let l = 0; l < layers; l++) {
+          const energy = l < 2 ? bass : l < 4 ? mid : treble;
+          ctx.beginPath();
+          const hue = (t * 20 + l * 50 + 120) % 360;
+          ctx.fillStyle = `hsla(${hue}, 70%, 55%, ${0.08 + energy * 0.15})`;
+          ctx.moveTo(0, h);
+          for (let x = 0; x <= w; x += 8) {
+            const wave =
+              Math.sin(x * 0.006 + t * 1.5 + l) * (40 + energy * 180) +
+              Math.sin(x * 0.013 - t * 2 + l * 2) * (25 + energy * 90);
+            const y = cy + wave + (l - layers / 2) * 30;
+            ctx.lineTo(x, y);
+          }
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fill();
         }
       }
 
-      if (mode === 'particles') {
-        for (const p of particles) {
-          p.y -= p.speed * 0.004 * (isPlaying ? 1 : 0.2);
-          if (p.y < 0) {
-            p.y = 1;
-            p.x = Math.random();
+      if (mode === 'battery' && fbCtx) {
+        // --- Núcleo flotante: deriva suave + pausas largas ---
+        const now = t;
+        if (now > nextRetarget && now > pauseUntil) {
+          if (Math.random() < 0.45) {
+            pauseUntil = now + 3 + Math.random() * 4;
+            targetX = coreX;
+            targetY = coreY;
+          } else {
+            const drift = Math.min(w, h) * 0.22;
+            targetX = coreX + (Math.random() - 0.5) * drift * 2;
+            targetY = coreY + (Math.random() - 0.5) * drift * 2;
+            const margin = Math.min(w, h) * 0.2;
+            targetX = Math.max(margin, Math.min(w - margin, targetX));
+            targetY = Math.max(margin, Math.min(h - margin, targetY));
           }
-          const pulse = 1 + 0.5 * Math.sin(t * 3 + p.x * 10);
-          const px = p.x * w;
-          const py = p.y * h;
-          const radius = p.r * pulse * (w / 400);
-          ctx.beginPath();
-          ctx.arc(px, py, radius, 0, Math.PI * 2);
-          ctx.fillStyle = `hsla(${(p.hue + t * 30) % 360}, 75%, 65%, 0.8)`;
-          ctx.fill();
+          nextRetarget = now + 4 + Math.random() * 3;
         }
+        coreX += (targetX - coreX) * 0.006;
+        coreY += (targetY - coreY) * 0.006;
+
+        // 1) Copiar frame anterior
+        fbCtx.clearRect(0, 0, w, h);
+        fbCtx.drawImage(canvas, 0, 0);
+
+        // 2) Repintar rotando/escalando (fondo rainbow lento y oscuro)
+        const bgHue = (t * 6) % 360;
+        ctx.fillStyle = `hsl(${bgHue}, 45%, 8%)`;
+        ctx.fillRect(0, 0, w, h);
+        ctx.save();
+        ctx.translate(coreX, coreY);
+        const rot = 0.004 + overall * 0.02;
+        const scale = 1.02 + bass * 0.02;
+        ctx.rotate(rot);
+        ctx.scale(scale, scale);
+        ctx.globalAlpha = 0.94;
+        ctx.drawImage(fb, -coreX, -coreY);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+
+        // 3) Filamentos saliendo del núcleo
+        const hueBase = (t * 6) % 360;
+        const filaments = 5;
+        for (let f = 0; f < filaments; f++) {
+          const energy = f % 3 === 0 ? bass : f % 3 === 1 ? mid : treble;
+          ctx.beginPath();
+          const baseAngle = t * 0.8 + (f / filaments) * Math.PI * 2;
+          let px = coreX,
+            py = coreY;
+          ctx.moveTo(px, py);
+          const segments = 30;
+          for (let s = 1; s <= segments; s++) {
+            const frac = s / segments;
+            const radius = frac * Math.min(w, h) * 0.4 * (0.6 + energy);
+            const wobble = Math.sin(t * 3 + s * 0.5 + f) * 0.6;
+            const angle = baseAngle + wobble + frac * 2;
+            px = coreX + Math.cos(angle) * radius;
+            py = coreY + Math.sin(angle) * radius;
+            ctx.lineTo(px, py);
+          }
+          const hue = (hueBase + f * 30) % 360;
+          ctx.strokeStyle = `hsla(${hue}, 80%, ${60 + energy * 30}%, ${0.25 + energy * 0.5})`;
+          ctx.lineWidth = 1.5 + energy * 3;
+          ctx.stroke();
+        }
+
+        // 4) Núcleo brillante que late
+        const coreR = 30 * (1 + bass * 2.5);
+        const grad = ctx.createRadialGradient(
+          coreX,
+          coreY,
+          0,
+          coreX,
+          coreY,
+          coreR,
+        );
+        grad.addColorStop(0, `hsla(${hueBase}, 100%, 90%, 0.95)`);
+        grad.addColorStop(0.5, `hsla(${(hueBase + 40) % 360}, 100%, 70%, 0.5)`);
+        grad.addColorStop(1, `hsla(${(hueBase + 40) % 360}, 100%, 60%, 0)`);
+        ctx.beginPath();
+        ctx.arc(coreX, coreY, coreR, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.fill();
       }
 
       rafRef.current = requestAnimationFrame(draw);
@@ -106,12 +238,13 @@ export const VisualizerView: FC = () => {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, [mode, isPlaying]);
+  }, [mode]);
 
   const modes: { value: Mode; label: string }[] = [
     { value: 'artwork', label: '🖼️ Artwork' },
-    { value: 'waves', label: '🌊 Ondas' },
-    { value: 'particles', label: '✨ Partículas' },
+    { value: 'plasma', label: '🌀 Núcleo' },
+    { value: 'aurora', label: '🌌 Aurora' },
+    { value: 'battery', label: '🔋 Battery' },
   ];
 
   return (
@@ -124,7 +257,6 @@ export const VisualizerView: FC = () => {
         boxSizing: 'border-box',
       }}
     >
-      {/* Botones de modo */}
       <div
         style={{
           display: 'flex',
@@ -155,7 +287,6 @@ export const VisualizerView: FC = () => {
         ))}
       </div>
 
-      {/* Área de visualización */}
       <div
         style={{
           flex: 1,
@@ -226,7 +357,7 @@ export const VisualizerView: FC = () => {
               width: '100%',
               height: '100%',
               borderRadius: 16,
-              background: 'rgba(20,12,16,1)',
+              background: '#000',
             }}
           />
         )}
