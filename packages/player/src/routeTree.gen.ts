@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VisualizerRouteImport } from './routes/visualizer'
 import { Route as TopArtistsRouteImport } from './routes/top-artists'
 import { Route as SourcesRouteImport } from './routes/sources'
 import { Route as SearchRouteImport } from './routes/search'
@@ -24,6 +25,11 @@ import { Route as PlaylistsImportProviderIdRouteImport } from './routes/playlist
 import { Route as ArtistProviderIdArtistIdRouteImport } from './routes/artist/$providerId/$artistId'
 import { Route as AlbumProviderIdAlbumIdRouteImport } from './routes/album/$providerId/$albumId'
 
+const VisualizerRoute = VisualizerRouteImport.update({
+  id: '/visualizer',
+  path: '/visualizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TopArtistsRoute = TopArtistsRouteImport.update({
   id: '/top-artists',
   path: '/top-artists',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/top-artists': typeof TopArtistsRoute
+  '/visualizer': typeof VisualizerRoute
   '/favorites/albums': typeof FavoritesAlbumsRoute
   '/favorites/artists': typeof FavoritesArtistsRoute
   '/favorites/tracks': typeof FavoritesTracksRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/top-artists': typeof TopArtistsRoute
+  '/visualizer': typeof VisualizerRoute
   '/favorites/albums': typeof FavoritesAlbumsRoute
   '/favorites/artists': typeof FavoritesArtistsRoute
   '/favorites/tracks': typeof FavoritesTracksRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/sources': typeof SourcesRoute
   '/top-artists': typeof TopArtistsRoute
+  '/visualizer': typeof VisualizerRoute
   '/favorites/albums': typeof FavoritesAlbumsRoute
   '/favorites/artists': typeof FavoritesArtistsRoute
   '/favorites/tracks': typeof FavoritesTracksRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sources'
     | '/top-artists'
+    | '/visualizer'
     | '/favorites/albums'
     | '/favorites/artists'
     | '/favorites/tracks'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sources'
     | '/top-artists'
+    | '/visualizer'
     | '/favorites/albums'
     | '/favorites/artists'
     | '/favorites/tracks'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/sources'
     | '/top-artists'
+    | '/visualizer'
     | '/favorites/albums'
     | '/favorites/artists'
     | '/favorites/tracks'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   SourcesRoute: typeof SourcesRoute
   TopArtistsRoute: typeof TopArtistsRoute
+  VisualizerRoute: typeof VisualizerRoute
   FavoritesAlbumsRoute: typeof FavoritesAlbumsRoute
   FavoritesArtistsRoute: typeof FavoritesArtistsRoute
   FavoritesTracksRoute: typeof FavoritesTracksRoute
@@ -216,6 +229,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visualizer': {
+      id: '/visualizer'
+      path: '/visualizer'
+      fullPath: '/visualizer'
+      preLoaderRoute: typeof VisualizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/top-artists': {
       id: '/top-artists'
       path: '/top-artists'
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   SourcesRoute: SourcesRoute,
   TopArtistsRoute: TopArtistsRoute,
+  VisualizerRoute: VisualizerRoute,
   FavoritesAlbumsRoute: FavoritesAlbumsRoute,
   FavoritesArtistsRoute: FavoritesArtistsRoute,
   FavoritesTracksRoute: FavoritesTracksRoute,

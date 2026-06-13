@@ -1,5 +1,6 @@
 import { createRootRoute } from '@tanstack/react-router';
 import {
+  AudioLinesIcon,
   BarChart2Icon,
   CableIcon,
   DiscIcon,
@@ -102,6 +103,11 @@ const RootComponent = () => {
                   to="/lyrics"
                   icon={<MicVocalIcon />}
                   label="Lyrics"
+                />
+                <SidebarNavigationItem
+                  to="/visualizer"
+                  icon={<AudioLinesIcon />}
+                  label="Visualizer"
                 />
               </div>
               <SidebarNavigationItem
