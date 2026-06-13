@@ -1,167 +1,44 @@
-<p align="center">
-  <picture>
-    <source alt="Nuclear Music Player"  srcset="packages/docs/.gitbook/assets/readme-banner.png">
-    <img alt="Nuclear Music Player"  srcset="packages/docs/.gitbook/assets/readme-banner.png">
-  </picture>
+# Hibi Nuclear Player 🌺
 
+A personalized fork of [Nuclear](https://github.com/nukeop/nuclear) — the free, open-source music player — with a custom Last.fm dashboard, lyrics, a Windows Media Player-style visualizer, and more.
 
-</p>
+> This is a modified version of Nuclear. All credit for the original player goes to [nukeop](https://github.com/nukeop) and the Nuclear contributors. This fork only adds personal features on top of their amazing work.
 
-<div align="center">
+## ✨ What's different in this version
 
-# Nuclear 
+- **🌺 Hibi Dashboard** — A custom dashboard powered by Last.fm that shows your top artists (with images), recently played tracks, and listening stats. Just enter any Last.fm username to connect.
+- **🎤 Lyrics view** — Built-in lyrics that fetch from multiple sources for the currently playing song.
+- **🎵 Visualizer** — Real-time audio visualizations that react to the actual frequencies of the music, inspired by the classic Windows Media Player visualizations:
+  - **Núcleo** — pulsing concentric rings
+  - **Aurora** — flowing organic waves
+  - **Battery** — a drifting smoke-like core with rainbow color shifts
+  - **Artwork** — large album art display
+- **🐛 Bug fix** — Marketplace themes now persist correctly after restarting the app (the original version forgot the selected theme on reboot).
+- **🌸 Custom hibiscus icon** — A fresh app icon.
+- **🚀 Default view** — Opens straight to the Hibi Dashboard on launch.
 
-</div>
+## 📦 Installation
 
-<div align="center">
-
-  Nuclear is a free, open-source music player without ads or tracking. Search for any song or artist, build playlists, and start listening.<br>
-  Runs on Windows, macOS, and Linux.
-  
-</div>
-
-## Screenshots
-
-<p align="center">
-  <img src="packages/docs/.gitbook/assets/dashboard-main.png" alt="Nuclear Music Player - Dashboard" width="100%">
-</p>
-
-Nuclear comes with multiple built-in themes:
-
-<p align="center">
-  <img src="packages/docs/.gitbook/assets/dashboard-green.png" alt="Green theme" width="32%">
-  <img src="packages/docs/.gitbook/assets/dashboard-aqua.png" alt="Aqua theme" width="32%">
-  <img src="packages/docs/.gitbook/assets/dashboard-mint.png" alt="Mint theme" width="32%">
-</p>
-<p align="center">
-  <img src="packages/docs/.gitbook/assets/dashboard-orange.png" alt="Orange theme" width="32%">
-  <img src="packages/docs/.gitbook/assets/dashboard-red.png" alt="Red theme" width="32%">
-  <img src="packages/docs/.gitbook/assets/dashboard-violet.png" alt="Violet theme" width="32%">
-</p>
-
-| | |
-|:---:|:---:|
-| ![Search artists](packages/docs/.gitbook/assets/search-artists.png) | ![Search albums](packages/docs/.gitbook/assets/search-albums.png) |
-| Artist search | Album search |
-| ![Playlists](packages/docs/.gitbook/assets/playlists.png) | ![Plugin store](packages/docs/.gitbook/assets/plugin-store.png) |
-| Playlists | Plugin store |
-| ![Installed plugins](packages/docs/.gitbook/assets/installed-plugins.png) | ![Preferences](packages/docs/.gitbook/assets/preferences.png) |
-| Installed plugins | Preferences |
-| ![What's new](packages/docs/.gitbook/assets/whats-new.png) | ![Log viewer](packages/docs/.gitbook/assets/log-viewer.png) |
-| What's new | Log viewer |
-
-## Download
-
-Grab the latest release for your platform from the [Releases page](https://github.com/nukeop/nuclear/releases).
-
-| Platform | Formats |
-|----------|---------|
-| Windows | `.exe` installer, `.msi` |
-| macOS | `.dmg` (Apple Silicon and Intel) |
-| Linux | `.AppImage`, `.deb`, `.rpm`, `.flatpak` |
-
-## Features
-
-- Search for music and stream it from any source
-- Browse artist pages with biographies, discographies, and similar artists
-- Browse album pages with track listings
-- Queue management with shuffle, repeat, and drag-and-drop reordering
-- Favorites (albums, artists, and tracks)
-- Playlists (create, import, export, import from varous services)
-- Powerful plugin system with a built-in plugin store
-- Themes (built-in and custom CSS themes)
-- MCP server lets your AI agent drive the player
-- Auto-updates
-- Keyboard shortcuts
-- Localized in multiple languages
-
-## Plugins
-
-Nuclear has a powerful plugin system now! Every functionality has been redesigned to be driven by plugins.
-
-Plugins can provide streaming sources, metadata, playlists, dashboard content, and more. Browse and install plugins from the built-in plugin store, or write your own using the [@nuclearplayer/plugin-sdk](https://www.npmjs.com/package/@nuclearplayer/plugin-sdk).
-
-## MCP
-
-You can enable the MCP server in Settings → Integrations.
-
-Then to add it to **Claude Code:**
+Download the latest installer from the [Releases](../../releases) page, or build it yourself:
 
 ```bash
-claude mcp add nuclear --transport http http://127.0.0.1:8800/mcp
+pnpm install
+pnpm --filter @nuclearplayer/player build
 ```
 
-**Codex CLI:**
+The installer will be generated in `packages/player/src-tauri/target/release/bundle/nsis/`.
 
-```bash
-codex mcp add nuclear --url http://127.0.0.1:8800/mcp
-```
-
-**OpenCode:**
-
-```json
-{
-  "mcp": {
-    "nuclear": {
-      "type": "remote",
-      "url": "http://127.0.0.1:8800/mcp"
-    }
-  }
-}
-```
-
-**Claude Desktop / Cursor / Windsurf:**
-
-```json
-{
-  "mcpServers": {
-    "nuclear": {
-      "url": "http://127.0.0.1:8800/mcp"
-    }
-  }
-}
-```
-
-The MCP is designed to be discoverable, but there's a skill you can load to get your AI up to speed: [Nuclear MCP Skill](./packages/docs/public/skills/nuclear-mcp.zip)
-
-## Development
+## 🛠️ Built with
 
 Nuclear is a pnpm monorepo managed with Turborepo. The main app is built with Tauri (Rust + React).
 
-### Prerequisites
+## 🙏 Credits
 
-- Node.js >= 22
-- pnpm >= 9
-- Rust (stable)
-- Platform-specific Tauri dependencies ([see Tauri docs](https://v2.tauri.app/start/prerequisites/))
+- Original player: **[Nuclear by nukeop](https://github.com/nukeop/nuclear)**
+- This fork & custom features: **[hibimarc-script](https://github.com/hibimarc-script)**
 
-### Getting started
+## 📄 License
 
-```bash
-git clone https://github.com/nukeop/nuclear.git
-cd nuclear
-pnpm install
-pnpm dev
-```
+This project is licensed under **AGPL-3.0**, the same license as the original Nuclear project. See the [LICENSE](./LICENSE) file for details.
 
-### Useful commands
-
-```bash
-pnpm dev            # Run the player in dev mode
-pnpm dev:remote     # Same, but binds Vite to 0.0.0.0 so you can open the remote control UI from other devices on your LAN
-pnpm build          # Build all packages
-pnpm test           # Run all tests
-pnpm lint           # Lint all packages
-pnpm type-check     # TypeScript checks
-pnpm storybook      # Run Storybook
-```
-
-## Community
-
-- [Discord](https://discord.gg/JqPjKxE)
-- [Mastodon](https://fosstodon.org/@nuclearplayer)
-- [Discussions](https://github.com/nukeop/nuclear/discussions)
-
-## License
-
-AGPL-3.0. See [LICENSE](LICENSE).
+Copyright 2025-2026 nukeop (original work) and contributors.
