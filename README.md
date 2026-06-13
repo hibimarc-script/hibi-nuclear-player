@@ -1,4 +1,4 @@
-# Hibi Nuclear Player 🌺
+# Hibi Nuclear Player 🌺 ⚠️ This is an unofficial personal fork and is not affiliated with or endorsed by the official Nuclear project.
 
 A personalized fork of [Nuclear](https://github.com/nukeop/nuclear) — the free, open-source music player — with a custom Last.fm dashboard, lyrics, a Windows Media Player-style visualizer, and more.
 
