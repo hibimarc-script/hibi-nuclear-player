@@ -38,19 +38,32 @@ export const loadAndApplyMarketplaceTheme = async (
 };
 
 export const applyAdvancedThemeFromSettingsIfAny = async (): Promise<void> => {
-  const { activeTheme, isAdvancedThemeSelected } = useThemeStore.getState();
-  if (!isAdvancedThemeSelected()) {
+  const { activeTheme, isAdvancedThemeSelected, isMarketplaceThemeSelected } =
+    useThemeStore.getState();
+
+  if (isAdvancedThemeSelected()) {
+    const { path } = activeTheme as AdvancedTheme;
+    try {
+      setThemeId('');
+      await loadAndApplyAdvancedThemeFromFile(path);
+    } catch (error) {
+      toast.error("Couldn't load advanced theme", {
+        description: error instanceof Error ? error.message : String(error),
+      });
+    }
     return;
   }
 
-  const { path } = activeTheme as AdvancedTheme;
-
-  try {
-    setThemeId('');
-    await loadAndApplyAdvancedThemeFromFile(path);
-  } catch (error) {
-    toast.error("Couldn't load advanced theme", {
-      description: error instanceof Error ? error.message : String(error),
-    });
+  if (isMarketplaceThemeSelected()) {
+    const id = (activeTheme as { type: 'marketplace'; id: string }).id;
+    try {
+      setThemeId('');
+      await loadAndApplyMarketplaceTheme(id);
+    } catch (error) {
+      toast.error("Couldn't load marketplace theme", {
+        description: error instanceof Error ? error.message : String(error),
+      });
+    }
+    return;
   }
 };

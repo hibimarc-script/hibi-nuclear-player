@@ -97,7 +97,6 @@ export const useThemeStore = create<ThemeStoreState>((set, get) => ({
     const id = useSettingsStore
       .getState()
       .getValue('core.theme.active.id') as string;
-
     if (type === 'basic' && id) {
       set({ activeTheme: { type: 'basic', id } });
       setThemeId(id);
