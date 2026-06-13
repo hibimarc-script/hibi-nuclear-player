@@ -46,6 +46,8 @@ To install them:
 ### Available plugins
 
 - **Hibi YouTube Playlists** — Import YouTube and YouTube Music playlists directly into your library without needing yt-dlp.
+- Hibi Lyrics
+- I've also added a youtube stream plug in from the original creator NukeOP due to this one work perfect for streaming
 
 ## 🛠️ Built with
 
