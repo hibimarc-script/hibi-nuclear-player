@@ -154,7 +154,9 @@ export const TopArtistsView: FC = () => {
         provider: 'nuclear-plugin-youtube',
         id: `${artistName} ${trackName}`,
       },
-      artwork: imageUrl ? [{ url: imageUrl, type: 'cover' as const }] : [],
+      artwork: imageUrl
+        ? { items: [{ url: imageUrl, purpose: 'thumbnail' as const }] }
+        : undefined,
     };
     addToQueue([track]);
     const items = useQueueStore.getState().items;
