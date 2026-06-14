@@ -33,6 +33,7 @@ export const useUpdaterStore = create<UpdaterState>((set, get) => ({
   error: null,
 
   checkForUpdate: async () => {
+    return;
     const checkEnabled = getSetting('core.updates.checkForUpdates');
     if (checkEnabled === false) {
       return;

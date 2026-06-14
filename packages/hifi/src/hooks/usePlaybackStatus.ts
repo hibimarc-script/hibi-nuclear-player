@@ -26,8 +26,6 @@ export const usePlaybackStatus = (
       return;
     }
 
-    const srcChanged = srcUrl !== activeSrcRef.current;
-
     const tryPlay = () => {
       if (!isReadyToPlay(audio)) {
         return;
@@ -47,9 +45,11 @@ export const usePlaybackStatus = (
 
     switch (status) {
       case 'playing': {
-        if (!srcChanged) {
-          tryPlay();
-        }
+        // Intentar reproducir siempre que el audio ya esté listo,
+        // haya cambiado la fuente o no. Esto arregla el caso en que
+        // el evento 'canplay' ya ocurrió antes de pasar a 'playing'
+        // (canción en queue al iniciar, o recién instalado).
+        tryPlay();
         const onCanPlay = () => tryPlay();
         audio.addEventListener('canplay', onCanPlay);
         return () => audio.removeEventListener('canplay', onCanPlay);

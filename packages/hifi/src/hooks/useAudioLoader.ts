@@ -24,6 +24,10 @@ export const useAudioLoader = (
     }
 
     if (src.url !== prevUrl.current) {
+      // Limpiar el audio anterior antes de cargar el nuevo,
+      // para que no suene un cachito de la canción previa.
+      audio.pause();
+      audio.currentTime = 0;
       audio.src = src.url;
       audio.load();
       prevUrl.current = src.url;

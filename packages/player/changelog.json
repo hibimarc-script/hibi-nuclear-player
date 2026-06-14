@@ -1,5 +1,77 @@
 [
   {
+    "date": "2026-06-13T00:00",
+    "description": "Hibi Dashboard: a custom Last.fm dashboard with top artists, recently played, and listening stats",
+    "type": "feature",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Hibi",
+        "color": "red"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-13T00:00",
+    "description": "Synced lyrics view in Spotify style, with auto-scroll, click-to-seek, and caching",
+    "type": "feature",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Hibi",
+        "color": "red"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-13T00:00",
+    "description": "Visualizer with real-time audio reactive effects inspired by classic Windows Media Player (Battery, Aurora, Nucleo)",
+    "type": "feature",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Hibi",
+        "color": "red"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-13T00:00",
+    "description": "Hibi YouTube Playlists plugin imports YouTube and YouTube Music playlists without yt-dlp",
+    "type": "feature",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Hibi",
+        "color": "red"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-13T00:00",
+    "description": "Fix marketplace themes not persisting after restart",
+    "type": "fix",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Themes",
+        "color": "purple"
+      }
+    ]
+  },
+  {
+    "date": "2026-06-13T00:00",
+    "description": "Fix tracks getting stuck in pause when starting from the queue on a fresh install",
+    "type": "fix",
+    "contributors": ["hibimarc-script"],
+    "tags": [
+      {
+        "label": "Playback",
+        "color": "green"
+      }
+    ]
+  },
+  {
     "date": "2026-06-10T00:00",
     "description": "Right-click a queue item to see its stream candidates and switch to a different source; picking a failed source retries it",
     "type": "feature",
